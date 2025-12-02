@@ -16,8 +16,8 @@ services:
     env: php
     region: oregon
     plan: free
-    buildCommand: composer install --no-dev --optimize-autoloader && php artisan key:generate --force
-    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    buildCommand: composer install --no-dev --optimize-autoloader && php artisan key:generate --force && mkdir -p database && touch database/database.sqlite
+    startCommand: mkdir -p database && touch database/database.sqlite && chmod 664 database/database.sqlite && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
     healthCheckPath: /api/produtos
     envVars:
       - key: APP_ENV
@@ -33,7 +33,7 @@ services:
       - key: DB_CONNECTION
         value: sqlite
       - key: DB_DATABASE
-        value: /opt/render/project/src/database/database.sqlite
+        value: database/database.sqlite
       # Add these manually in Render dashboard:
       # - APP_KEY (will be generated)
       # - Any other environment variables from your .env file
