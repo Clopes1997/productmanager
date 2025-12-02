@@ -34,14 +34,14 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 # Copy application files
 COPY . .
 
-# Run composer scripts and set permissions
+# Run composer scripts, create database, set permissions, and run migrations
 RUN composer dump-autoload --optimize \
+    && touch database/database.sqlite \
     && chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
-
-# Create database file if it doesn't exist
-RUN touch database/database.sqlite || true
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache \
+    && php artisan migrate --force \
+    && chown www-data:www-data database/database.sqlite
 
 # Expose port (Render uses $PORT environment variable)
 EXPOSE 8000
