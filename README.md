@@ -29,6 +29,10 @@ The application follows a **decoupled architecture**:
 
 ### API Endpoints
 
+**Health Check:**
+- `GET /api/` - Health check endpoint (returns `{"message": "API WORKS!"}`)
+
+**Products:**
 - `GET /api/produtos` - List all products
 - `GET /api/produtos/{id}` - Get single product
 - `POST /api/produtos` - Create product
@@ -37,8 +41,16 @@ The application follows a **decoupled architecture**:
 - `GET /api/produtos/filter` - Filter by price range
 - `GET /api/produtos/filter/cidade` - Filter by city
 - `GET /api/produtos/filter/marca` - Filter by brand
+- `GET /api/produtos/stats` - Get product statistics
+- `GET /api/produtos/stats/filtered` - Get filtered product statistics
+
+**Reference Data:**
 - `GET /api/marcas` - List all brands
 - `GET /api/cidades` - List all cities
+
+**Utility Routes:**
+- `GET/POST /api/utils/seed-test-data` - Populate database with test data (idempotent)
+- `GET/POST /api/utils/clear-database` - Clear all data from all tables
 
 ### Frontend Configuration
 
@@ -89,12 +101,21 @@ php artisan key:generate
 # Run migrations
 php artisan migrate
 
-# Seed database (optional)
+# Seed database with test data (optional)
 php artisan db:seed
+
+# OR use the utility route to seed test data:
+# GET/POST http://localhost:8000/api/utils/seed-test-data
 
 # Start development server
 php artisan serve
 ```
+
+**Note:** If you encounter 500 errors, ensure:
+1. Migrations have been run: `php artisan migrate`
+2. Database connection is configured in `.env`
+3. `APP_DEBUG=true` in `.env` for detailed error messages
+4. Use `/api/utils/seed-test-data` to populate test data
 
 The API will be available at `http://localhost:8000`
 

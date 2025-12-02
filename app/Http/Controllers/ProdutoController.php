@@ -78,27 +78,28 @@ class ProdutoController extends Controller
     $cidade_id = $request->input('cidade_id'); // Recebe o ID da cidade
     $marca_id = $request->input('marca_id');   // Recebe o ID da marca
 
-    // Verifica se não há filtros aplicados
-    if (is_null($min) && is_null($max) && is_null($cidade_id) && is_null($marca_id)) {
-        // Se não houver filtros, busca todos os produtos
-        $produtos = Produto::with(['marca', 'cidade'])->get();
-    } else {
-        // Inicia a consulta com os filtros de valor
-        $query = Produto::whereBetween('valor', [$min ?? 0, $max ?? Number.MAX_VALUE]);
+    // Inicia a consulta
+    $query = Produto::query();
 
-        // Filtra por cidade se o ID for fornecido
-        if ($cidade_id) {
-            $query->where('cidade_id', $cidade_id);
-        }
-
-        // Filtra por marca se o ID for fornecido
-        if ($marca_id) {
-            $query->where('marca_id', $marca_id);
-        }
-
-        // Obter todos os produtos filtrados
-        $produtos = $query->with(['marca', 'cidade'])->get();
+    // Aplica filtros de valor se fornecidos
+    if (!is_null($min) || !is_null($max)) {
+        $minValue = $min ?? 0;
+        $maxValue = $max ?? PHP_FLOAT_MAX;
+        $query->whereBetween('valor', [$minValue, $maxValue]);
     }
+
+    // Filtra por cidade se o ID for fornecido
+    if ($cidade_id) {
+        $query->where('cidade_id', $cidade_id);
+    }
+
+    // Filtra por marca se o ID for fornecido
+    if ($marca_id) {
+        $query->where('marca_id', $marca_id);
+    }
+
+    // Obter todos os produtos filtrados
+    $produtos = $query->with(['marca', 'cidade'])->get();
 
     // Calcula a soma e a média
     $soma_total = $produtos->sum('valor');
@@ -116,7 +117,7 @@ class ProdutoController extends Controller
     $cidade_id = $request->input('cidade_id'); // ID da cidade
     $marca_id = $request->input('marca_id');   // ID da marca
     $min = $request->input('min') ?: 0;        // Valor mínimo
-    $max = $request->input('max') ?: Number.MAX_VALUE; // Valor máximo
+    $max = $request->input('max') ?: PHP_FLOAT_MAX; // Valor máximo
 
     // Inicia a consulta
     $query = Produto::query();
