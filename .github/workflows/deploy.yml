@@ -46,14 +46,17 @@ jobs:
           cp -r public/front/* _site/
           # Create .nojekyll file to disable Jekyll processing
           touch _site/.nojekyll
-          # Inject API base URL from secrets
-          if [ -n "${{ secrets.API_BASE_URL }}" ]; then
-            # Use a more reliable method to replace the API URL
-            sed -i "s|window.API_BASE_URL = window.API_BASE_URL || '';|window.API_BASE_URL = '${{ secrets.API_BASE_URL }}';|g" _site/index.html
-            echo "✅ API Base URL configured: ${{ secrets.API_BASE_URL }}"
+          # Inject API base URL from secrets or use default
+          API_URL="${{ secrets.API_BASE_URL }}"
+          if [ -z "$API_URL" ]; then
+            API_URL="https://productmanager-api.onrender.com"
+            echo "ℹ️  Using default API URL: $API_URL"
           else
-            echo "⚠️  API_BASE_URL secret not set. Using relative URLs."
+            echo "✅ API Base URL from secret: $API_URL"
           fi
+          # Replace the API URL in index.html
+          sed -i "s|window.API_BASE_URL = window.API_BASE_URL || '';|window.API_BASE_URL = '$API_URL';|g" _site/index.html
+          echo "🚀 Frontend configured with API: $API_URL"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
