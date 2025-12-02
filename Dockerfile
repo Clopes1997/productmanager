@@ -35,16 +35,13 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 # Copy application files
 COPY . .
 
-# Run composer scripts, create database, set permissions, and run migrations
+# Run composer scripts, create database, set permissions
 RUN composer dump-autoload --optimize \
     && mkdir -p database \
     && touch database/database.sqlite \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/bootstrap/cache \
-    && (test -f .env || (touch .env && echo "APP_DEBUG=true" >> .env)) \
-    && php artisan key:generate --force \
-    && php artisan migrate --force \
     && chown www-data:www-data database/database.sqlite
 
 # Expose port (Render uses $PORT environment variable)
