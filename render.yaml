@@ -16,8 +16,8 @@ services:
     env: php
     region: oregon
     plan: free
-    buildCommand: composer install --no-dev --optimize-autoloader && mkdir -p database && touch database/database.sqlite && (test -f .env || (touch .env && echo "APP_DEBUG=true" >> .env)) && php artisan key:generate --force
-    startCommand: mkdir -p database && touch database/database.sqlite && chmod 664 database/database.sqlite && php artisan config:clear && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
+    buildCommand: composer install --no-dev --optimize-autoloader && mkdir -p database && touch database/database.sqlite
+    startCommand: mkdir -p database && touch database/database.sqlite && chmod 664 database/database.sqlite && php artisan migrate --force && php artisan config:clear && php artisan serve --host=0.0.0.0 --port=$PORT
     healthCheckPath: /api/produtos
     envVars:
       - key: APP_ENV
