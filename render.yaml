@@ -16,14 +16,14 @@ services:
     env: php
     region: oregon
     plan: free
-    buildCommand: composer install --no-dev --optimize-autoloader && mkdir -p database && touch database/database.sqlite && (test -f .env || touch .env) && php artisan key:generate --force
+    buildCommand: composer install --no-dev --optimize-autoloader && mkdir -p database && touch database/database.sqlite && (test -f .env || (touch .env && echo "APP_DEBUG=true" >> .env)) && php artisan key:generate --force
     startCommand: mkdir -p database && touch database/database.sqlite && chmod 664 database/database.sqlite && php artisan config:clear && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
     healthCheckPath: /api/produtos
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: false
+        value: true
       - key: APP_URL
         fromService:
           type: web
@@ -32,8 +32,7 @@ services:
       # Database - using SQLite for simplicity (free tier)
       - key: DB_CONNECTION
         value: sqlite
-      - key: DB_DATABASE
-        value: database/database.sqlite
+      # DB_DATABASE not set - Laravel will use database_path('database.sqlite') which resolves correctly
       # Session and Cache
       - key: SESSION_DRIVER
         value: database

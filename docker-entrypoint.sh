@@ -10,11 +10,20 @@ mkdir -p bootstrap/cache
 chown -R www-data:www-data storage bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
-# Create database if it doesn't exist
-if [ ! -f database/database.sqlite ]; then
-    touch database/database.sqlite
-    chown www-data:www-data database/database.sqlite
-    chmod 664 database/database.sqlite
+# Determine database path - use DB_DATABASE env var if set, otherwise default
+if [ -n "$DB_DATABASE" ]; then
+    DB_PATH="$DB_DATABASE"
+else
+    DB_PATH="database/database.sqlite"
+fi
+
+# Create database directory and file
+DB_DIR=$(dirname "$DB_PATH")
+mkdir -p "$DB_DIR"
+if [ ! -f "$DB_PATH" ]; then
+    touch "$DB_PATH"
+    chown www-data:www-data "$DB_PATH"
+    chmod 664 "$DB_PATH"
 fi
 
 # Run migrations if needed
