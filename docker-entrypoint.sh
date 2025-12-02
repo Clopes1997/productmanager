@@ -20,14 +20,24 @@ echo "APP_DEBUG=true" >> .env
 
 # Generate APP_KEY if not set in environment
 if [ -z "$APP_KEY" ]; then
-    # Check if APP_KEY exists in .env file with valid format
-    if ! grep -q "^APP_KEY=base64:" .env 2>/dev/null; then
+    # Check if APP_KEY exists in .env file
+    if ! grep -q "^APP_KEY=" .env 2>/dev/null; then
         echo "Generating APP_KEY..."
         php artisan key:generate --force
+        # Extract the key value and remove base64: prefix
+        APP_KEY_VALUE=$(grep "^APP_KEY=" .env | cut -d '=' -f2- | sed 's/^base64://')
+        # Remove old APP_KEY line and add new one without base64: prefix
+        grep -v "^APP_KEY=" .env > .env.tmp 2>/dev/null || true
+        echo "APP_KEY=$APP_KEY_VALUE" >> .env.tmp
+        mv .env.tmp .env
     fi
 else
-    # APP_KEY is set as environment variable, ensure it's in .env
-    echo "APP_KEY=$APP_KEY" >> .env
+    # APP_KEY is set as environment variable - remove base64: prefix if present
+    APP_KEY_CLEAN=$(echo "$APP_KEY" | sed 's/^base64://')
+    # Remove old APP_KEY line and add new one
+    grep -v "^APP_KEY=" .env > .env.tmp 2>/dev/null || true
+    echo "APP_KEY=$APP_KEY_CLEAN" >> .env.tmp
+    mv .env.tmp .env
 fi
 
 # Determine database path - use DB_DATABASE env var if set, otherwise default
