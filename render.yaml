@@ -1,0 +1,40 @@
+# Render.com deployment configuration
+# This file helps you quickly deploy your Laravel API to Render.com
+# 
+# Instructions:
+# 1. Sign up at https://render.com
+# 2. Connect your GitHub account
+# 3. Select "New Web Service"
+# 4. Connect your repository: Clopes1997/productmanager
+# 5. Render will automatically detect this file
+# 6. Add your environment variables (see below)
+# 7. Deploy!
+
+services:
+  - type: web
+    name: productmanager-api
+    env: php
+    region: oregon
+    plan: free
+    buildCommand: composer install --no-dev --optimize-autoloader && php artisan key:generate --force
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    healthCheckPath: /api/produtos
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        fromService:
+          type: web
+          name: productmanager-api
+          property: host
+      # Database - using SQLite for simplicity (free tier)
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /opt/render/project/src/database/database.sqlite
+      # Add these manually in Render dashboard:
+      # - APP_KEY (will be generated)
+      # - Any other environment variables from your .env file
+

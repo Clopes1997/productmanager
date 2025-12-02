@@ -9,7 +9,7 @@ $(document).ready(function () {
 
     function fetchProdutos() {
         $.ajax({
-            url: '/api/produtos',
+            url: getApiUrl('api/produtos'),
             method: 'GET',
             success: renderProdutos,
             error: handleError('Erro ao buscar produtos')
@@ -66,7 +66,7 @@ $(document).ready(function () {
 
     function fetchMarcas() {
         $.ajax({
-            url: '/api/marcas',
+            url: getApiUrl('api/marcas'),
             method: 'GET',
             success: function (data) {
                 data.forEach(marca => {
@@ -81,7 +81,7 @@ $(document).ready(function () {
 
     function fetchCidades() {
         $.ajax({
-            url: '/api/cidades',
+            url: getApiUrl('api/cidades'),
             method: 'GET',
             success: function (data) {
                 const addDropdown = $('#add_cidade_id').empty(); // Limpa o dropdown do modal de adicionar
@@ -119,7 +119,7 @@ $(document).ready(function () {
     $(document).on('click', '.edit', function () {
         const id = $(this).data('id'); // Obtém o ID do produto
         $.ajax({
-            url: `/api/produtos/${id}`,
+            url: getApiUrl(`api/produtos/${id}`),
             method: 'GET',
             success: function (produto) {
                 $('#editNome').val(produto.nome);
@@ -155,7 +155,7 @@ $('#addProdutoForm').submit(function (event) {
 
 function createProduto(produtoData) {
     $.ajax({
-        url: '/api/produtos',
+        url: getApiUrl('api/produtos'),
         method: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(produtoData),
@@ -201,7 +201,7 @@ function validateProdutoData(produtoData) {
 
 function updateProduto(id, produtoData) {
     $.ajax({
-        url: `/api/produtos/${id}`,
+        url: getApiUrl(`api/produtos/${id}`),
         method: 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(produtoData),
@@ -221,7 +221,7 @@ function updateProduto(id, produtoData) {
     $(document).on('click', '.delete', function () {
         const id = $(this).data('id');
         $.ajax({
-            url: `/api/produtos/${id}`,
+            url: getApiUrl(`api/produtos/${id}`),
             method: 'GET',
             success: function (produto) {
                 if (produto.estoque > 0) {
@@ -230,7 +230,7 @@ function updateProduto(id, produtoData) {
                 } else {
                     // Se o estoque for 0
                     $.ajax({
-                        url: `/api/produtos/${id}`,
+                        url: getApiUrl(`api/produtos/${id}`),
                         method: 'DELETE',
                         success: function () {
                             fetchProdutos();
@@ -259,7 +259,7 @@ function updateProduto(id, produtoData) {
         const max = $('#maxValor').val();
 
         $.ajax({
-            url: '/api/produtos/filter',
+            url: getApiUrl('api/produtos/filter'),
             method: 'GET',
             data: { min: min, max: max },
             success: renderProdutos, // Atualiza a tabela com os produtos filtrados
@@ -272,7 +272,7 @@ function updateProduto(id, produtoData) {
         const cidadeId = $('#cidade_id').val(); // Certifique-se de que o ID do dropdown de cidade é correto
     
         $.ajax({
-            url: '/api/produtos/filter/cidade', // Certifique-se de que essa rota está implementada na sua API
+            url: getApiUrl('api/produtos/filter/cidade'), // Certifique-se de que essa rota está implementada na sua API
             method: 'GET',
             data: { cidade_id: cidadeId },
             success: renderProdutos, // Atualiza a tabela com os produtos filtrados
@@ -285,7 +285,7 @@ function updateProduto(id, produtoData) {
         const marcaId = $('#marca_id').val(); // Supondo que o ID do dropdown de marca é 'marca_id'
 
         $.ajax({
-            url: '/api/produtos/filter/marca', // Certifique-se de que essa rota está implementada na sua API
+            url: getApiUrl('api/produtos/filter/marca'), // Certifique-se de que essa rota está implementada na sua API
             method: 'GET',
             data: { marca_id: marcaId },
             success: renderProdutos, // Atualiza a tabela com os produtos filtrados
