@@ -51,7 +51,11 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
   CMD curl -f http://localhost:8000/api/produtos || exit 1
 
-# Start Laravel server
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Start Laravel server via entrypoint
 # Render provides $PORT environment variable
-CMD php artisan serve --host=0.0.0.0 --port=${PORT:-8000}
+ENTRYPOINT ["docker-entrypoint.sh"]
 
