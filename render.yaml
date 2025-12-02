@@ -16,8 +16,8 @@ services:
     env: php
     region: oregon
     plan: free
-    buildCommand: composer install --no-dev --optimize-autoloader && php artisan key:generate --force && mkdir -p database && touch database/database.sqlite
-    startCommand: mkdir -p database && touch database/database.sqlite && chmod 664 database/database.sqlite && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
+    buildCommand: composer install --no-dev --optimize-autoloader && mkdir -p database && touch database/database.sqlite && (test -f .env || touch .env) && php artisan key:generate --force
+    startCommand: mkdir -p database && touch database/database.sqlite && chmod 664 database/database.sqlite && php artisan config:clear && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT
     healthCheckPath: /api/produtos
     envVars:
       - key: APP_ENV
@@ -34,7 +34,15 @@ services:
         value: sqlite
       - key: DB_DATABASE
         value: database/database.sqlite
-      # Add these manually in Render dashboard:
-      # - APP_KEY (will be generated)
-      # - Any other environment variables from your .env file
+      # Session and Cache
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      # Add these manually in Render dashboard (optional):
+      # - APP_KEY (will be auto-generated if not set, format: base64:...)
+      # - APP_NAME (optional, defaults to "Laravel")
+      # - LOG_LEVEL (optional, defaults to "error")
 
